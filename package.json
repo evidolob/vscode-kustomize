@@ -1,0 +1,89 @@
+{
+  "name": "vscode-kustomize",
+  "displayName": "Kustomize",
+  "description": "Kustomize support by RedHat",
+  "version": "0.0.1",
+  "publisher": "redhat",
+  "engines": {
+    "vscode": "^1.62.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "contributors": [
+    {
+      "name": "Yevhen Vydolob",
+      "email": "yvydolob@redhat.com"
+    }
+  ],
+  "extensionDependencies": [
+    "redhat.vscode-yaml"
+  ],
+  "activationEvents": [
+    "onLanguage:yaml",
+    "workspaceContains:kustomization.y(a)ml"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "vscode-kustomize.build",
+        "title": "Kustomize: Build"
+      },
+      {
+        "command": "vscode-kustomize.preview",
+        "title": "Kustomize: Preview"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "vscode-kustomize.build",
+          "when": "filesExplorerFocus"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "vscode-kustomize.preview",
+          "when": "resourceFilename =~ /kustomization.y(a)ml/"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "bundle-tools": "node ./scripts/install-tools.js",
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "build": "yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
+    "@types/glob": "^7.1.4",
+    "@types/node": "14.x",
+    "@types/semver": "^7.3.9",
+    "@types/shelljs": "^0.8.9",
+    "@types/vscode": "^1.62.0",
+    "@typescript-eslint/eslint-plugin": "^5.1.0",
+    "@typescript-eslint/parser": "^5.1.0",
+    "@vscode/test-electron": "^1.6.2",
+    "eslint": "^8.1.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "glob": "^7.1.7",
+    "hasha": "^5.2.2",
+    "prettier": "^2.4.1",
+    "request": "^2.88.2",
+    "request-progress": "^3.0.0",
+    "targz": "^1.0.1",
+    "typescript": "^4.4.4",
+    "unzip-stream": "^0.3.1"
+  },
+  "dependencies": {
+    "fs-extra": "^10.0.0",
+    "semver": "^7.3.5",
+    "shelljs": "^0.8.4"
+  }
+}

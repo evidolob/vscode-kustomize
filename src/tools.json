@@ -1,0 +1,34 @@
+{
+  "kustomize": {
+    "description": "Kustomize CLI tool",
+    "vendor": "Kubernetes-sig",
+    "name": "kustomize",
+    "version": "4.4.1",
+    "versionRange": "4.4.1",
+    "versionRangeLabel": "v4.4.1",
+    "dlFileName": "kustomize",
+    "cmdFileName": "kustomize",
+    "filePrefix": "",
+    "platform": {
+      "win32": {
+        "url": "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.4.1/kustomize_v4.4.1_windows_amd64.tar.gz",
+        "sha256sum": "3e1b11456a81924c16c8df89653ed8597f0c446f9f56628f25f8f1abb2fe0c44",
+        "dlFileName": "kustomize_windows_amd64.tar.gz",
+        "cmdFileName": "kustomize.exe"
+      },
+      "darwin": {
+        "url": "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.4.1/kustomize_v4.4.1_darwin_amd64.tar.gz",
+        "sha256sum": "1b0eba143cd684f98341d58100c17a2dfb9658375302fe38d725752ea92012ac",
+        "dlFileName": "kustomize_darwin_amd64.tar.gz",
+        "cmdFileName": "kustomize"
+      },
+      "linux": {
+        "url": "https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.4.1/kustomize_v4.4.1_linux_amd64.tar.gz",
+        "sha256sum": "2d5927efec40ba32a121c49f6df9955b8b8a296ef1dec4515a46fc84df158798",
+        "dlFileName": "kustomize_linux_amd64.tar.gz",
+        "cmdFileName": "kustomize"
+      }
+    }
+  }
+}
+
