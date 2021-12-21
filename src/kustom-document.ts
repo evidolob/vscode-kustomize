@@ -18,8 +18,11 @@ export class KustomizationDocumentProvider implements vscode.TextDocumentContent
     }
   }
 
-  addContent(uri: vscode.Uri, content: string): void {
+  addContent(uri: vscode.Uri, content: string, fireEvent = false): void {
     this.contentCache.set(uri.toString(), content);
+    if (fireEvent) {
+      this.onDidChangeEventEmitter.fire(uri);
+    }
   }
 
   createUri(res: string): vscode.Uri {

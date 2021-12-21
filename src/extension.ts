@@ -6,6 +6,7 @@
 import * as vscode from 'vscode';
 import { KustomizationDocumentProvider, PREVIEW_SCHEMA } from './kustom-document';
 import { KustomizeCli } from './kustomize';
+import { PreviewManager } from './kustomize-preview';
 import { JSONSchemaContributor } from './schema-provider';
 import { detectCli } from './tools';
 
@@ -26,7 +27,9 @@ export async function activate(context: vscode.ExtensionContext) {
   const kustomDocProvider = new KustomizationDocumentProvider();
   context.subscriptions.push(vscode.workspace.registerTextDocumentContentProvider(PREVIEW_SCHEMA, kustomDocProvider));
 
-  const kustomize = new KustomizeCli(cli, kustomDocProvider);
+  const kustomize = new KustomizeCli(cli);
+
+  const previewManager = new PreviewManager(kustomDocProvider, kustomize);
 
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-kustomize.build', (res) => {
@@ -36,7 +39,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('vscode-kustomize.preview', (res) => {
-      kustomize.preview(res);
+      previewManager.showKustomizePreview(res);
     })
   );
 }
