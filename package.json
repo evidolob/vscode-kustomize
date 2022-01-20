@@ -25,6 +25,16 @@
   ],
   "main": "./out/extension.js",
   "contributes": {
+    "grammars": [
+      {
+        "path": "./syntaxes/kustomize.json",
+        "scopeName": "kustomize-patch.injection",
+        "injectTo": ["source.yaml"],
+        "embeddedLanguages": {
+          "meta.embedded.inline.kustomize.yaml": "yaml"
+        }
+      }
+    ],
     "commands": [
       {
         "command": "vscode-kustomize.build",

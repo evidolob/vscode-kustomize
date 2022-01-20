@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "$ref": "#/definitions/Kustomization",
+  "title": "kustumization.yaml",
   "definitions": {
     "ConfigMapArgs": {
       "description": "ConfigMapArgs contains the metadata of how to generate a configmap",

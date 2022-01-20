@@ -1,0 +1,39 @@
+{
+  "scopeName": "kustomize-patch.injection",
+  "injectionSelector": "L:source.yaml",
+  "patterns": [
+    {
+      "include": "#kustom-patch"
+    }
+  ],
+  "repository": {
+    "kustom-patch": {
+      "begin": "^(- )(patch)(: )(\\|)(-)",
+      "beginCaptures": {
+        "1": {
+          "name": "punctuation.definition.block.sequence.item.yaml"
+        },
+        "2": {
+          "name": "entity.name.tag.yaml"
+        },
+        "3": {
+          "name": "punctuation.separator.key-value.mapping.yaml"
+        },
+        "4": {
+          "name": "keyword.control.flow.block-scalar.literal.yaml"
+        }, 
+        "5": {
+          "name": "storage.modifier.chomping-indicator.yaml"
+        }
+      },
+      "end": "^(?=\\S)|(?!\\G)",
+      "patterns": [
+        {
+          "begin": "^([ ]+)(?! )- op",
+          "end": "^(?!\\1|\\s*$)",
+          "name": "meta.embedded.inline.kustomize.yaml"
+        }
+      ]
+    }
+  }
+}
