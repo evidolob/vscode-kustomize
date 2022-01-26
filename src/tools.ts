@@ -3,14 +3,18 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { Platform } from './util/platform';
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as semver from 'semver';
 import { which } from 'shelljs';
+import * as vscode from 'vscode';
 
-import configData = require('./tools.json');
+import * as configData from './tools.json';
 import { cli } from './cli';
+import { downloadFile } from './util/download';
+import * as hasha from 'hasha';
+import { untar } from './util/archive';
+import { homedir } from 'os';
 
 interface ToolDef {
   description: string;
@@ -19,25 +23,19 @@ interface ToolDef {
   version: string;
   versionRange: string;
   versionRangeLabel: string;
+  filePrefix: string;
+  location: string | undefined;
+  url: string;
+  sha256sum: string;
   dlFileName: string;
   cmdFileName: string;
-  filePrefix: string;
-  location: Promise<string | undefined>;
-  platform: {
-    [key: string]: {
-      url: string;
-      sha256sum: string;
-      dlFileName: string;
-      cmdFileName: string;
-    };
-  };
 }
 interface ToolsMap {
   [cliName: string]: ToolDef;
 }
 function loadMetadata(requirements: object): ToolsMap {
   const req = JSON.parse(JSON.stringify(requirements));
-  const osFamily = Platform.OS;
+  const osFamily = process.platform;
   for (const object in requirements) {
     if (req[object].platform) {
       if (req[object].platform[osFamily]) {
@@ -55,18 +53,58 @@ const tools: ToolsMap = loadMetadata(configData);
 
 export async function detectCli(cliName: string): Promise<string | undefined> {
   if (tools[cliName].location === undefined) {
-    const toolCacheLocation = path.resolve(__dirname, '..', 'tools', Platform.OS, tools[cliName].cmdFileName);
+    const toolCacheLocation = path.resolve(homedir(), '.vs-kustomize', tools[cliName].cmdFileName);
     const toolLocations: string[] = [toolCacheLocation];
 
     const whichLocation = which(cliName);
     toolLocations.unshift(whichLocation && whichLocation.stdout);
 
-    tools[cliName].location = selectTool(toolLocations, tools[cliName].versionRange).then((location) => {
-      if (location && Platform.OS !== 'win32') {
+    const toolLocation = await selectTool(toolLocations, tools[cliName].versionRange).then((location) => {
+      if (location && process.platform !== 'win32') {
         fs.chmodSync(location, 0o765);
       }
       return location;
     });
+    let response: string | undefined;
+    // no tool locally, ask to download
+    if (!toolLocation) {
+      const cliTool = tools[cliName];
+
+      const installRequest = `Download and install v${cliTool.version}`;
+      response = await vscode.window.showInformationMessage(`Cannot find ${cliTool.description} v${cliTool.version}.`, installRequest, 'Cancel');
+      if (response === installRequest) {
+        const toolDlLocation = path.resolve(homedir(), '.vs-kustomize', cliTool.dlFileName);
+        await fs.ensureDir(path.resolve(homedir(), '.vs-kustomize'));
+        let action = undefined;
+        do {
+          await vscode.window.withProgress(
+            {
+              cancellable: true,
+              location: vscode.ProgressLocation.Notification,
+              title: `Downloading ${cliTool.description}`,
+            },
+            (progress: vscode.Progress<{ increment: number; message: string }>) =>
+              downloadFile(cliTool.url, toolDlLocation, (dlProgress, increment) => progress.report({ increment, message: `${dlProgress}%` }))
+          );
+
+          const sha256sum: string = await hasha.fromFile(toolDlLocation, { algorithm: 'sha256' });
+          if (sha256sum !== cliTool.sha256sum) {
+            fs.removeSync(toolDlLocation);
+            action = await vscode.window.showInformationMessage(`Checksum for downloaded ${cliTool.description} v${cliTool.version} is not correct.`, 'Download again', 'Cancel');
+          }
+        } while (action === 'Download again');
+
+        if (action !== 'Cancel') {
+          if (toolDlLocation.endsWith('.tar.gz')) {
+            await untar(toolDlLocation, path.resolve(path.resolve(homedir(), '.vs-kustomize')), cliTool.filePrefix);
+            await fs.remove(toolDlLocation);
+            tools[cliName].location = path.resolve(homedir(), '.vs-kustomize', cliTool.cmdFileName);
+          }
+        }
+      }
+    } else {
+      tools[cliName].location = toolLocation;
+    }
   }
   return tools[cliName].location;
 }

@@ -7,7 +7,6 @@ import { cli, CliExitData } from './cli';
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs-extra';
-import { KustomizationDocumentProvider } from './kustom-document';
 
 export class KustomizeCli {
   constructor(private readonly cli: string) {}
@@ -22,7 +21,7 @@ export class KustomizeCli {
           vscode.workspace.workspaceFolders?.map((it) => {
             return { label: it.name, uri: it.uri };
           }),
-          { canPickMany: false, title: 'Select path to run "kustomize"' }
+          { canPickMany: false, title: 'Select path to run "kustomization"' }
         );
         if (folder) {
           argArr.push(folder.uri.fsPath);
@@ -30,7 +29,6 @@ export class KustomizeCli {
       }
     }
     const result = await cli.execute(this.cli, argArr);
-    console.error(result.stdout);
     if (result.stderr) {
       vscode.window.showErrorMessage(result.stderr);
     }
