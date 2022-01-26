@@ -88,13 +88,11 @@ export class JSONSchemaContributor {
     if (textEditor) {
       const schemaPath = 'kustomization.json';
       if (schemaPath) {
-        // if (schemaPaths.includes(schemaPath)) {
         let resourceUrl = vscode.Uri.parse(resource);
         const scheme = 'kustomize';
         resourceUrl = resourceUrl.with({ scheme });
         this.uriCache.set(resourceUrl.toString(), textEditor.document.uri.toString());
         return resourceUrl.toString();
-        // }
       }
     }
 

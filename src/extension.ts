@@ -21,7 +21,6 @@ export async function activate(context: vscode.ExtensionContext) {
     if (result === 'Install') {
       vscode.env.openExternal(vscode.Uri.parse('https://kubectl.docs.kubernetes.io/installation/kustomize/'));
     }
-    // TODO: find a better solution
     return;
   }
   const kustomDocProvider = new KustomizationDocumentProvider();
